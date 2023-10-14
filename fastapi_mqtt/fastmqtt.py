@@ -179,9 +179,10 @@ class FastMQTT:
         for topic_template in self.subscriptions:
             if self.match(topic, topic_template):
                 log_info.debug(f"Calling specific handler for topic {topic}")
-                for handler in self.subscriptions[topic_template][1]:
-                    gather.append(handler(client, topic, payload, qos, properties))
-
+                gather.extend(
+                    handler(client, topic, payload, qos, properties)
+                    for handler in self.subscriptions[topic_template][1]
+                )
         return await asyncio.gather(*gather)
 
     def publish(
